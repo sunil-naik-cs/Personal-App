@@ -1,0 +1,2234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Personal Tracker</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#0b0f14;
+    color:#fff;
+    min-height:100vh;
+}
+
+header{
+    padding:20px;
+    text-align:center;
+    border-bottom:1px solid #202833;
+}
+
+header h1{
+    font-size:24px;
+}
+
+.container{
+    padding:15px;
+    padding-bottom:90px;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+.card{
+    background:#121821;
+    border:1px solid #222c38;
+    border-radius:16px;
+    padding:16px;
+    margin-bottom:15px;
+}
+
+.card h2{
+    margin-bottom:12px;
+}
+
+.stat-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.stat{
+    background:#151d27;
+    border-radius:14px;
+    padding:15px;
+}
+
+.stat h3{
+    font-size:26px;
+    margin-bottom:5px;
+}
+
+.stat p{
+    color:#8d98a6;
+    font-size:13px;
+}
+
+input,
+textarea,
+select{
+    width:100%;
+    padding:12px;
+    margin-top:7px;
+    margin-bottom:15px;
+    background:#0c1117;
+    color:white;
+    border:1px solid #303b48;
+    border-radius:10px;
+    outline:none;
+}
+
+textarea{
+    min-height:100px;
+    resize:vertical;
+}
+
+label{
+    color:#b8c1cc;
+    font-size:14px;
+}
+
+button{
+    border:none;
+    border-radius:10px;
+    padding:12px 16px;
+    background:#2563eb;
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+}
+
+button:active{
+    transform:scale(.98);
+}
+
+.btn-danger{
+    background:#dc2626;
+}
+
+.btn-secondary{
+    background:#303b48;
+}
+
+.btn-success{
+    background:#16a34a;
+}
+
+.photo-preview{
+    display:none;
+    width:100%;
+    max-height:300px;
+    object-fit:cover;
+    border-radius:14px;
+    margin-top:5px;
+    margin-bottom:15px;
+}
+
+.entry{
+    background:#121821;
+    border:1px solid #222c38;
+    border-radius:16px;
+    padding:15px;
+    margin-bottom:15px;
+}
+
+.entry-date{
+    color:#60a5fa;
+    font-size:13px;
+    margin-bottom:8px;
+}
+
+.entry-title{
+    font-size:18px;
+    margin-bottom:8px;
+}
+
+.entry-text{
+    color:#b7c0cb;
+    line-height:1.5;
+    margin-bottom:8px;
+}
+
+.entry-photo{
+    width:100%;
+    max-height:300px;
+    object-fit:cover;
+    border-radius:12px;
+    margin:10px 0;
+}
+
+.tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin:10px 0;
+}
+
+.tag{
+    background:#1d2936;
+    color:#93c5fd;
+    padding:6px 9px;
+    border-radius:20px;
+    font-size:12px;
+}
+
+.entry-actions{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+}
+
+.entry-actions button{
+    flex:1;
+}
+
+.bottom-nav{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    height:70px;
+    background:#10161e;
+    border-top:1px solid #242d38;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    z-index:100;
+}
+
+.nav-btn{
+    background:none;
+    color:#8d98a6;
+    padding:8px;
+    font-size:12px;
+}
+
+.nav-btn.active{
+    color:#60a5fa;
+}
+
+.calendar{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:5px;
+}
+
+.day-name{
+    text-align:center;
+    color:#7f8a98;
+    font-size:11px;
+    padding:5px 0;
+}
+
+.calendar-day{
+    min-height:42px;
+    background:#151d27;
+    border-radius:8px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+    font-size:13px;
+}
+
+.calendar-day.has-entry{
+    border:1px solid #2563eb;
+    color:#60a5fa;
+}
+
+.calendar-day.today{
+    background:#1d4ed8;
+    color:white;
+}
+
+.month-controls{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.month-controls button{
+    padding:8px 12px;
+}
+
+.empty{
+    text-align:center;
+    padding:30px 10px;
+    color:#7f8a98;
+}
+
+.progress{
+    width:100%;
+    height:10px;
+    background:#202a35;
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:8px;
+}
+
+.progress-bar{
+    height:100%;
+    width:0%;
+    background:#2563eb;
+}
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    z-index:200;
+    padding:20px;
+    overflow:auto;
+}
+
+.modal-content{
+    max-width:500px;
+    margin:40px auto;
+    background:#121821;
+    border:1px solid #2a3440;
+    border-radius:18px;
+    padding:20px;
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.close{
+    background:#303b48;
+    padding:7px 11px;
+}
+
+.report-number{
+    font-size:32px;
+    margin-bottom:5px;
+}
+
+.report-label{
+    color:#8d98a6;
+}
+
+hr{
+    border:none;
+    border-top:1px solid #252f3a;
+    margin:15px 0;
+}
+
+@media(min-width:700px){
+    .container{
+        max-width:700px;
+        margin:auto;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>My Personal Tracker</h1>
+</header>
+
+<div class="container">
+
+    <!-- HOME -->
+    <section id="homePage" class="page active">
+
+        <div class="card">
+            <h2>Today's Progress</h2>
+
+            <div class="stat-grid">
+
+                <div class="stat">
+                    <h3 id="totalDays">0</h3>
+                    <p>Total Days</p>
+                </div>
+
+                <div class="stat">
+                    <h3 id="totalStudy">0</h3>
+                    <p>Study Hours</p>
+                </div>
+
+                <div class="stat">
+                    <h3 id="totalWorkout">0</h3>
+                    <p>Workout Days</p>
+                </div>
+
+                <div class="stat">
+                    <h3 id="totalTravel">0</h3>
+                    <p>Places</p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Current Streak</h2>
+            <h3 id="streak">0 days</h3>
+        </div>
+
+        <div class="card">
+            <h2>Today's Entry</h2>
+            <div id="todayEntry"></div>
+        </div>
+
+        <button onclick="showPage('addPage')">
+            + Add Today's Progress
+        </button>
+
+    </section>
+
+
+    <!-- ADD -->
+    <section id="addPage" class="page">
+
+        <div class="card">
+
+            <h2>Add Daily Progress</h2>
+
+            <label>Date</label>
+            <input type="date" id="date">
+
+            <label>What did you learn?</label>
+            <textarea
+                id="learned"
+                placeholder="Example: JavaScript fetch API..."
+            ></textarea>
+
+            <label>What did you practice?</label>
+            <textarea
+                id="practice"
+                placeholder="Example: Built GitHub API project..."
+            ></textarea>
+
+            <label>Study Time (hours)</label>
+            <input
+                type="number"
+                id="studyTime"
+                min="0"
+                step="0.5"
+                placeholder="2"
+            >
+
+            <label>Workout?</label>
+            <select id="workout">
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+            </select>
+
+            <label>Workout Details</label>
+            <input
+                type="text"
+                id="workoutDetails"
+                placeholder="Example: Pushups, walking..."
+            >
+
+            <label>Travel / Place Visited</label>
+            <input
+                type="text"
+                id="travel"
+                placeholder="Example: Mysuru"
+            >
+
+            <label>Travel Details</label>
+            <textarea
+                id="travelDetails"
+                placeholder="What did you do there?"
+            ></textarea>
+
+
+            <!-- CAMERA -->
+            <label>Photo</label>
+
+            <input
+                type="file"
+                id="photo"
+                accept="image/*"
+                capture="environment"
+            >
+
+            <img
+                id="photoPreview"
+                class="photo-preview"
+            >
+
+
+            <label>Notes</label>
+
+            <textarea
+                id="notes"
+                placeholder="Anything important today..."
+            ></textarea>
+
+            <button onclick="saveEntry()">
+                Save Entry
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- CALENDAR -->
+    <section id="calendarPage" class="page">
+
+        <div class="card">
+
+            <div class="month-controls">
+
+                <button
+                    class="btn-secondary"
+                    onclick="previousMonth()"
+                >
+                    ←
+                </button>
+
+                <h2 id="monthTitle"></h2>
+
+                <button
+                    class="btn-secondary"
+                    onclick="nextMonth()"
+                >
+                    →
+                </button>
+
+            </div>
+
+            <div class="calendar" id="calendar"></div>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Selected Day</h2>
+
+            <div id="selectedDay">
+                Select a date
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- TIMELINE -->
+    <section id="timelinePage" class="page">
+
+        <div class="card">
+
+            <h2>Timeline</h2>
+
+            <input
+                type="search"
+                id="search"
+                placeholder="Search your entries..."
+                oninput="renderTimeline()"
+            >
+
+        </div>
+
+        <div id="timeline"></div>
+
+    </section>
+
+
+    <!-- REPORT -->
+    <section id="reportPage" class="page">
+
+        <div class="card">
+
+            <h2>Monthly Report</h2>
+
+            <label>Select Month</label>
+
+            <input
+                type="month"
+                id="reportMonth"
+                onchange="generateReport()"
+            >
+
+        </div>
+
+        <div id="report"></div>
+
+    </section>
+
+
+    <!-- SETTINGS -->
+    <section id="settingsPage" class="page">
+
+        <div class="card">
+
+            <h2>Settings</h2>
+
+            <button
+                class="btn-success"
+                onclick="exportData()"
+            >
+                Export Data
+            </button>
+
+            <br><br>
+
+            <label>Import Data</label>
+
+            <input
+                type="file"
+                id="importFile"
+                accept=".json"
+                onchange="importData(event)"
+            >
+
+            <hr>
+
+            <button
+                class="btn-danger"
+                onclick="deleteAllData()"
+            >
+                Delete All Data
+            </button>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- BOTTOM NAV -->
+
+<div class="bottom-nav">
+
+    <button
+        class="nav-btn active"
+        onclick="showPage('homePage',this)"
+    >
+        🏠<br>Home
+    </button>
+
+    <button
+        class="nav-btn"
+        onclick="showPage('addPage',this)"
+    >
+        ➕<br>Add
+    </button>
+
+    <button
+        class="nav-btn"
+        onclick="showPage('calendarPage',this)"
+    >
+        📅<br>Calendar
+    </button>
+
+    <button
+        class="nav-btn"
+        onclick="showPage('timelinePage',this)"
+    >
+        📝<br>Timeline
+    </button>
+
+    <button
+        class="nav-btn"
+        onclick="showPage('reportPage',this)"
+    >
+        📊<br>Report
+    </button>
+
+    <button
+        class="nav-btn"
+        onclick="showPage('settingsPage',this)"
+    >
+        ⚙️<br>Settings
+    </button>
+
+</div>
+
+
+<!-- EDIT MODAL -->
+
+<div id="editModal" class="modal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>Edit Entry</h2>
+
+            <button
+                class="close"
+                onclick="closeModal()"
+            >
+                ✕
+            </button>
+
+        </div>
+
+        <input type="hidden" id="editId">
+
+        <label>Date</label>
+
+        <input
+            type="date"
+            id="editDate"
+        >
+
+        <label>What did you learn?</label>
+
+        <textarea id="editLearned"></textarea>
+
+        <label>What did you practice?</label>
+
+        <textarea id="editPractice"></textarea>
+
+        <label>Study Time</label>
+
+        <input
+            type="number"
+            id="editStudyTime"
+            min="0"
+            step="0.5"
+        >
+
+        <label>Workout</label>
+
+        <select id="editWorkout">
+            <option value="No">No</option>
+            <option value="Yes">Yes</option>
+        </select>
+
+        <label>Workout Details</label>
+
+        <input
+            type="text"
+            id="editWorkoutDetails"
+        >
+
+        <label>Travel / Place</label>
+
+        <input
+            type="text"
+            id="editTravel"
+        >
+
+        <label>Travel Details</label>
+
+        <textarea id="editTravelDetails"></textarea>
+
+        <label>Photo</label>
+
+        <input
+            type="file"
+            id="editPhoto"
+            accept="image/*"
+            capture="environment"
+        >
+
+        <img
+            id="editPhotoPreview"
+            class="photo-preview"
+        >
+
+        <label>Notes</label>
+
+        <textarea id="editNotes"></textarea>
+
+        <button onclick="updateEntry()">
+            Update Entry
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const STORAGE_KEY = "personalTracker";
+
+let entries =
+    JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+let currentPhoto = "";
+
+let editPhotoData = "";
+
+let calendarDate = new Date();
+
+
+// =========================
+// PAGE NAVIGATION
+// =========================
+
+function showPage(pageId, button){
+
+    document.querySelectorAll(".page")
+        .forEach(page => {
+            page.classList.remove("active");
+        });
+
+    document.getElementById(pageId)
+        .classList.add("active");
+
+    document.querySelectorAll(".nav-btn")
+        .forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+    if(button){
+        button.classList.add("active");
+    }
+
+    if(pageId === "homePage"){
+        updateDashboard();
+    }
+
+    if(pageId === "calendarPage"){
+        renderCalendar();
+    }
+
+    if(pageId === "timelinePage"){
+        renderTimeline();
+    }
+
+    if(pageId === "reportPage"){
+        generateReport();
+    }
+
+}
+
+
+// =========================
+// DATE
+// =========================
+
+function getToday(){
+
+    const d = new Date();
+
+    const year = d.getFullYear();
+
+    const month =
+        String(d.getMonth()+1).padStart(2,"0");
+
+    const day =
+        String(d.getDate()).padStart(2,"0");
+
+    return `${year}-${month}-${day}`;
+}
+
+
+document.getElementById("date").value = getToday();
+
+
+// =========================
+// PHOTO COMPRESS
+// =========================
+
+function compressImage(file, callback){
+
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+
+        const img = new Image();
+
+        img.onload = function(){
+
+            const canvas =
+                document.createElement("canvas");
+
+            const maxWidth = 1200;
+
+            let width = img.width;
+            let height = img.height;
+
+            if(width > maxWidth){
+
+                height =
+                    height * maxWidth / width;
+
+                width = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx =
+                canvas.getContext("2d");
+
+            ctx.drawImage(
+                img,
+                0,
+                0,
+                width,
+                height
+            );
+
+            const compressed =
+                canvas.toDataURL(
+                    "image/jpeg",
+                    0.7
+                );
+
+            callback(compressed);
+
+        };
+
+        img.src = e.target.result;
+
+    };
+
+    reader.readAsDataURL(file);
+}
+
+
+// =========================
+// CAMERA PHOTO
+// =========================
+
+document
+    .getElementById("photo")
+    .addEventListener("change", function(){
+
+        const file = this.files[0];
+
+        if(!file) return;
+
+        compressImage(file, function(data){
+
+            currentPhoto = data;
+
+            const preview =
+                document.getElementById(
+                    "photoPreview"
+                );
+
+            preview.src = data;
+
+            preview.style.display = "block";
+
+        });
+
+    });
+
+
+// =========================
+// SAVE ENTRY
+// =========================
+
+function saveEntry(){
+
+    const date =
+        document.getElementById("date").value;
+
+    const learned =
+        document.getElementById("learned").value.trim();
+
+    const practice =
+        document.getElementById("practice").value.trim();
+
+    const studyTime =
+        Number(
+            document.getElementById("studyTime").value
+        ) || 0;
+
+    const workout =
+        document.getElementById("workout").value;
+
+    const workoutDetails =
+        document.getElementById(
+            "workoutDetails"
+        ).value.trim();
+
+    const travel =
+        document.getElementById("travel").value.trim();
+
+    const travelDetails =
+        document.getElementById(
+            "travelDetails"
+        ).value.trim();
+
+    const notes =
+        document.getElementById("notes").value.trim();
+
+
+    if(!date){
+
+        alert("Please select date");
+
+        return;
+    }
+
+
+    const entry = {
+
+        id: Date.now(),
+
+        date: date,
+
+        learned: learned,
+
+        practice: practice,
+
+        studyTime: studyTime,
+
+        workout: workout,
+
+        workoutDetails: workoutDetails,
+
+        travel: travel,
+
+        travelDetails: travelDetails,
+
+        notes: notes,
+
+        photo: currentPhoto || ""
+
+    };
+
+
+    entries.push(entry);
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(entries)
+    );
+
+
+    alert("Entry saved successfully!");
+
+    clearForm();
+
+    updateDashboard();
+
+    showPage("homePage");
+
+}
+
+
+// =========================
+// CLEAR FORM
+// =========================
+
+function clearForm(){
+
+    document.getElementById("date").value =
+        getToday();
+
+    document.getElementById("learned").value = "";
+
+    document.getElementById("practice").value = "";
+
+    document.getElementById("studyTime").value = "";
+
+    document.getElementById("workout").value = "No";
+
+    document.getElementById("workoutDetails").value = "";
+
+    document.getElementById("travel").value = "";
+
+    document.getElementById("travelDetails").value = "";
+
+    document.getElementById("notes").value = "";
+
+    document.getElementById("photo").value = "";
+
+    currentPhoto = "";
+
+    const preview =
+        document.getElementById("photoPreview");
+
+    preview.src = "";
+
+    preview.style.display = "none";
+}
+
+
+// =========================
+// DASHBOARD
+// =========================
+
+function updateDashboard(){
+
+    document.getElementById("totalDays")
+        .textContent = entries.length;
+
+
+    const totalStudy =
+        entries.reduce(
+            (sum, entry) =>
+                sum + Number(entry.studyTime || 0),
+            0
+        );
+
+
+    document.getElementById("totalStudy")
+        .textContent =
+        totalStudy.toFixed(1);
+
+
+    const workoutDays =
+        entries.filter(
+            entry => entry.workout === "Yes"
+        ).length;
+
+
+    document.getElementById("totalWorkout")
+        .textContent = workoutDays;
+
+
+    const travelDays =
+        entries.filter(
+            entry => entry.travel
+        ).length;
+
+
+    document.getElementById("totalTravel")
+        .textContent = travelDays;
+
+
+    calculateStreak();
+
+    showTodayEntry();
+}
+
+
+// =========================
+// TODAY ENTRY
+// =========================
+
+function showTodayEntry(){
+
+    const today = getToday();
+
+    const entry =
+        entries.find(
+            e => e.date === today
+        );
+
+
+    const container =
+        document.getElementById("todayEntry");
+
+
+    if(!entry){
+
+        container.innerHTML =
+            `<div class="empty">
+                No entry for today.
+            </div>`;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        createEntryHTML(entry, false);
+}
+
+
+// =========================
+// STREAK
+// =========================
+
+function calculateStreak(){
+
+    if(entries.length === 0){
+
+        document.getElementById("streak")
+            .textContent = "0 days";
+
+        return;
+    }
+
+
+    const dates =
+        [...new Set(
+            entries.map(e => e.date)
+        )].sort().reverse();
+
+
+    let streak = 0;
+
+    let current = new Date();
+
+
+    for(const dateString of dates){
+
+        const date =
+            new Date(dateString + "T00:00:00");
+
+        const expected =
+            new Date(current);
+
+        expected.setHours(0,0,0,0);
+
+
+        if(
+            date.getTime() ===
+            expected.getTime()
+        ){
+
+            streak++;
+
+            current.setDate(
+                current.getDate() - 1
+            );
+
+        }else{
+
+            break;
+        }
+    }
+
+
+    document.getElementById("streak")
+        .textContent =
+        `${streak} days`;
+}
+
+
+// =========================
+// ENTRY HTML
+// =========================
+
+function createEntryHTML(entry, actions=true){
+
+    let html = `
+
+        <div class="entry">
+
+            <div class="entry-date">
+                ${entry.date}
+            </div>
+
+    `;
+
+
+    if(entry.learned){
+
+        html += `
+
+            <div class="entry-title">
+                📚 Learned
+            </div>
+
+            <div class="entry-text">
+                ${escapeHTML(entry.learned)}
+            </div>
+
+        `;
+    }
+
+
+    if(entry.practice){
+
+        html += `
+
+            <div class="entry-title">
+                💻 Practice
+            </div>
+
+            <div class="entry-text">
+                ${escapeHTML(entry.practice)}
+            </div>
+
+        `;
+    }
+
+
+    html += `
+
+        <div class="tags">
+
+            <span class="tag">
+                ⏱ ${entry.studyTime || 0}h
+            </span>
+
+            <span class="tag">
+                🏋️ ${entry.workout}
+            </span>
+
+    `;
+
+
+    if(entry.travel){
+
+        html += `
+
+            <span class="tag">
+                📍 ${escapeHTML(entry.travel)}
+            </span>
+
+        `;
+    }
+
+
+    html += `
+
+        </div>
+    `;
+
+
+    if(entry.workoutDetails){
+
+        html += `
+
+            <div class="entry-text">
+                🏋️ ${escapeHTML(
+                    entry.workoutDetails
+                )}
+            </div>
+
+        `;
+    }
+
+
+    if(entry.travelDetails){
+
+        html += `
+
+            <div class="entry-text">
+                📍 ${escapeHTML(
+                    entry.travelDetails
+                )}
+            </div>
+
+        `;
+    }
+
+
+    if(entry.photo){
+
+        html += `
+
+            <img
+                class="entry-photo"
+                src="${entry.photo}"
+                alt="Daily photo"
+            >
+
+        `;
+    }
+
+
+    if(entry.notes){
+
+        html += `
+
+            <div class="entry-text">
+                📝 ${escapeHTML(entry.notes)}
+            </div>
+
+        `;
+    }
+
+
+    if(actions){
+
+        html += `
+
+            <div class="entry-actions">
+
+                <button
+                    class="btn-secondary"
+                    onclick="openEdit(${entry.id})"
+                >
+                    Edit
+                </button>
+
+                <button
+                    class="btn-danger"
+                    onclick="deleteEntry(${entry.id})"
+                >
+                    Delete
+                </button>
+
+            </div>
+
+        `;
+    }
+
+
+    html += `</div>`;
+
+
+    return html;
+}
+
+
+// =========================
+// ESCAPE HTML
+// =========================
+
+function escapeHTML(text){
+
+    return String(text)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+
+// =========================
+// TIMELINE
+// =========================
+
+function renderTimeline(){
+
+    const container =
+        document.getElementById("timeline");
+
+    const search =
+        document.getElementById("search")
+            .value
+            .toLowerCase();
+
+
+    let filtered =
+        entries.filter(entry => {
+
+            const text =
+                JSON.stringify(entry)
+                    .toLowerCase();
+
+            return text.includes(search);
+        });
+
+
+    filtered.sort(
+        (a,b) =>
+            new Date(b.date) -
+            new Date(a.date)
+    );
+
+
+    if(filtered.length === 0){
+
+        container.innerHTML =
+            `<div class="empty">
+                No entries found.
+            </div>`;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        filtered
+            .map(entry =>
+                createEntryHTML(entry,true)
+            )
+            .join("");
+}
+
+
+// =========================
+// DELETE ENTRY
+// =========================
+
+function deleteEntry(id){
+
+    if(!confirm("Delete this entry?")){
+
+        return;
+    }
+
+
+    entries =
+        entries.filter(
+            entry => entry.id !== id
+        );
+
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(entries)
+    );
+
+
+    renderTimeline();
+
+    updateDashboard();
+
+    renderCalendar();
+}
+
+
+// =========================
+// EDIT ENTRY
+// =========================
+
+function openEdit(id){
+
+    const entry =
+        entries.find(
+            e => e.id === id
+        );
+
+
+    if(!entry) return;
+
+
+    document.getElementById("editId")
+        .value = entry.id;
+
+    document.getElementById("editDate")
+        .value = entry.date;
+
+    document.getElementById("editLearned")
+        .value = entry.learned || "";
+
+    document.getElementById("editPractice")
+        .value = entry.practice || "";
+
+    document.getElementById("editStudyTime")
+        .value = entry.studyTime || 0;
+
+    document.getElementById("editWorkout")
+        .value = entry.workout || "No";
+
+    document.getElementById("editWorkoutDetails")
+        .value =
+        entry.workoutDetails || "";
+
+    document.getElementById("editTravel")
+        .value = entry.travel || "";
+
+    document.getElementById("editTravelDetails")
+        .value =
+        entry.travelDetails || "";
+
+    document.getElementById("editNotes")
+        .value = entry.notes || "";
+
+
+    editPhotoData =
+        entry.photo || "";
+
+
+    const preview =
+        document.getElementById(
+            "editPhotoPreview"
+        );
+
+
+    if(entry.photo){
+
+        preview.src = entry.photo;
+
+        preview.style.display = "block";
+
+    }else{
+
+        preview.src = "";
+
+        preview.style.display = "none";
+    }
+
+
+    document.getElementById("editModal")
+        .style.display = "block";
+}
+
+
+// =========================
+// EDIT PHOTO
+// =========================
+
+document
+    .getElementById("editPhoto")
+    .addEventListener("change", function(){
+
+        const file = this.files[0];
+
+        if(!file) return;
+
+
+        compressImage(file, function(data){
+
+            editPhotoData = data;
+
+
+            const preview =
+                document.getElementById(
+                    "editPhotoPreview"
+                );
+
+
+            preview.src = data;
+
+            preview.style.display = "block";
+
+        });
+
+    });
+
+
+// =========================
+// UPDATE ENTRY
+// =========================
+
+function updateEntry(){
+
+    const id =
+        Number(
+            document.getElementById("editId").value
+        );
+
+
+    const entry =
+        entries.find(
+            e => e.id === id
+        );
+
+
+    if(!entry) return;
+
+
+    entry.date =
+        document.getElementById(
+            "editDate"
+        ).value;
+
+
+    entry.learned =
+        document.getElementById(
+            "editLearned"
+        ).value.trim();
+
+
+    entry.practice =
+        document.getElementById(
+            "editPractice"
+        ).value.trim();
+
+
+    entry.studyTime =
+        Number(
+            document.getElementById(
+                "editStudyTime"
+            ).value
+        ) || 0;
+
+
+    entry.workout =
+        document.getElementById(
+            "editWorkout"
+        ).value;
+
+
+    entry.workoutDetails =
+        document.getElementById(
+            "editWorkoutDetails"
+        ).value.trim();
+
+
+    entry.travel =
+        document.getElementById(
+            "editTravel"
+        ).value.trim();
+
+
+    entry.travelDetails =
+        document.getElementById(
+            "editTravelDetails"
+        ).value.trim();
+
+
+    entry.notes =
+        document.getElementById(
+            "editNotes"
+        ).value.trim();
+
+
+    entry.photo =
+        editPhotoData || "";
+
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(entries)
+    );
+
+
+    alert("Entry updated!");
+
+    closeModal();
+
+    updateDashboard();
+
+    renderTimeline();
+
+    renderCalendar();
+}
+
+
+// =========================
+// CLOSE MODAL
+// =========================
+
+function closeModal(){
+
+    document.getElementById("editModal")
+        .style.display = "none";
+}
+
+
+// =========================
+// CALENDAR
+// =========================
+
+function renderCalendar(){
+
+    const calendar =
+        document.getElementById("calendar");
+
+    const title =
+        document.getElementById("monthTitle");
+
+
+    const year =
+        calendarDate.getFullYear();
+
+    const month =
+        calendarDate.getMonth();
+
+
+    const monthName =
+        calendarDate.toLocaleString(
+            "default",
+            {
+                month:"long"
+            }
+        );
+
+
+    title.textContent =
+        `${monthName} ${year}`;
+
+
+    calendar.innerHTML = "";
+
+
+    const days =
+        [
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat"
+        ];
+
+
+    days.forEach(day => {
+
+        const element =
+            document.createElement("div");
+
+        element.className =
+            "day-name";
+
+        element.textContent = day;
+
+        calendar.appendChild(element);
+
+    });
+
+
+    const firstDay =
+        new Date(
+            year,
+            month,
+            1
+        ).getDay();
+
+
+    const totalDays =
+        new Date(
+            year,
+            month + 1,
+            0
+        ).getDate();
+
+
+    for(let i=0;i<firstDay;i++){
+
+        const blank =
+            document.createElement("div");
+
+        calendar.appendChild(blank);
+    }
+
+
+    for(let day=1;day<=totalDays;day++){
+
+        const element =
+            document.createElement("div");
+
+
+        element.className =
+            "calendar-day";
+
+
+        const dateString =
+            `${year}-${String(month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+
+
+        element.textContent = day;
+
+
+        const hasEntry =
+            entries.some(
+                entry =>
+                    entry.date === dateString
+            );
+
+
+        if(hasEntry){
+
+            element.classList.add(
+                "has-entry"
+            );
+        }
+
+
+        if(dateString === getToday()){
+
+            element.classList.add(
+                "today"
+            );
+        }
+
+
+        element.onclick =
+            () => showSelectedDay(dateString);
+
+
+        calendar.appendChild(element);
+    }
+}
+
+
+// =========================
+// SELECTED DAY
+// =========================
+
+function showSelectedDay(date){
+
+    const container =
+        document.getElementById(
+            "selectedDay"
+        );
+
+
+    const dayEntries =
+        entries.filter(
+            entry =>
+                entry.date === date
+        );
+
+
+    if(dayEntries.length === 0){
+
+        container.innerHTML =
+            `<div class="empty">
+                No entry on ${date}
+            </div>`;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        dayEntries
+            .map(entry =>
+                createEntryHTML(entry,true)
+            )
+            .join("");
+}
+
+
+// =========================
+// PREVIOUS MONTH
+// =========================
+
+function previousMonth(){
+
+    calendarDate.setMonth(
+        calendarDate.getMonth() - 1
+    );
+
+    renderCalendar();
+}
+
+
+// =========================
+// NEXT MONTH
+// =========================
+
+function nextMonth(){
+
+    calendarDate.setMonth(
+        calendarDate.getMonth() + 1
+    );
+
+    renderCalendar();
+}
+
+
+// =========================
+// MONTHLY REPORT
+// =========================
+
+function generateReport(){
+
+    const report =
+        document.getElementById("report");
+
+
+    const monthInput =
+        document.getElementById(
+            "reportMonth"
+        );
+
+
+    if(!monthInput.value){
+
+        const now = new Date();
+
+        monthInput.value =
+            `${now.getFullYear()}-${String(
+                now.getMonth()+1
+            ).padStart(2,"0")}`;
+    }
+
+
+    const selectedMonth =
+        monthInput.value;
+
+
+    const monthly =
+        entries.filter(
+            entry =>
+                entry.date.startsWith(
+                    selectedMonth
+                )
+        );
+
+
+    const totalDays =
+        monthly.length;
+
+
+    const study =
+        monthly.reduce(
+            (sum,e) =>
+                sum + Number(e.studyTime || 0),
+            0
+        );
+
+
+    const workouts =
+        monthly.filter(
+            e => e.workout === "Yes"
+        ).length;
+
+
+    const travels =
+        monthly.filter(
+            e => e.travel
+        ).length;
+
+
+    const photos =
+        monthly.filter(
+            e => e.photo
+        ).length;
+
+
+    report.innerHTML = `
+
+        <div class="card">
+
+            <div class="stat-grid">
+
+                <div class="stat">
+
+                    <h3 class="report-number">
+                        ${totalDays}
+                    </h3>
+
+                    <p class="report-label">
+                        Active Days
+                    </p>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <h3 class="report-number">
+                        ${study.toFixed(1)}
+                    </h3>
+
+                    <p class="report-label">
+                        Study Hours
+                    </p>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <h3 class="report-number">
+                        ${workouts}
+                    </h3>
+
+                    <p class="report-label">
+                        Workout Days
+                    </p>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <h3 class="report-number">
+                        ${travels}
+                    </h3>
+
+                    <p class="report-label">
+                        Places Visited
+                    </p>
+
+                </div>
+
+            </div>
+
+            <hr>
+
+            <p>
+                📸 Photos saved:
+                <b>${photos}</b>
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>Monthly Activity</h2>
+
+            <p>
+                You recorded
+                <b>${totalDays}</b>
+                days this month.
+            </p>
+
+            <div class="progress">
+
+                <div
+                    class="progress-bar"
+                    style="width:${Math.min(
+                        totalDays / 30 * 100,
+                        100
+                    )}%"
+                ></div>
+
+            </div>
+
+        </div>
+
+    `;
+}
+
+
+// =========================
+// EXPORT DATA
+// =========================
+
+function exportData(){
+
+    const data =
+        JSON.stringify(
+            entries,
+            null,
+            2
+        );
+
+
+    const blob =
+        new Blob(
+            [data],
+            {
+                type:"application/json"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+
+    const a =
+        document.createElement("a");
+
+
+    a.href = url;
+
+    a.download =
+        "personal-tracker-backup.json";
+
+
+    a.click();
+
+
+    URL.revokeObjectURL(url);
+}
+
+
+// =========================
+// IMPORT DATA
+// =========================
+
+function importData(event){
+
+    const file =
+        event.target.files[0];
+
+
+    if(!file) return;
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload = function(e){
+
+        try{
+
+            const imported =
+                JSON.parse(e.target.result);
+
+
+            if(!Array.isArray(imported)){
+
+                throw new Error(
+                    "Invalid data"
+                );
+            }
+
+
+            entries = imported;
+
+
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(entries)
+            );
+
+
+            alert(
+                "Data imported successfully!"
+            );
+
+
+            updateDashboard();
+
+            renderTimeline();
+
+            renderCalendar();
+
+        }catch(error){
+
+            alert(
+                "Invalid JSON file."
+            );
+        }
+
+    };
+
+
+    reader.readAsText(file);
+}
+
+
+// =========================
+// DELETE ALL
+// =========================
+
+function deleteAllData(){
+
+    if(
+        !confirm(
+            "Are you sure? All tracker data will be deleted."
+        )
+    ){
+
+        return;
+    }
+
+
+    entries = [];
+
+
+    localStorage.removeItem(
+        STORAGE_KEY
+    );
+
+
+    updateDashboard();
+
+    renderTimeline();
+
+    renderCalendar();
+
+
+    alert(
+        "All data deleted."
+    );
+}
+
+
+// =========================
+// START APP
+// =========================
+
+updateDashboard();
+
+renderCalendar();
+
+renderTimeline();
+
+generateReport();
+
+</script>
+
+</body>
+</html>
