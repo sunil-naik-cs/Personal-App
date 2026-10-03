@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Security</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #050505;
+            color: white;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+
+        /* =========================
+           LOGIN PAGE
+        ========================= */
+
+        #loginPage {
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    #18251c 0%,
+                    #080808 55%,
+                    #000 100%
+                );
+        }
+
+
+        .box {
+            width: 90%;
+            max-width: 400px;
+
+            padding: 35px;
+
+            background: rgba(15, 15, 15, 0.96);
+
+            border: 1px solid #333;
+
+            border-radius: 16px;
+
+            text-align: center;
+
+            box-shadow:
+                0 0 30px rgba(0, 230, 118, 0.12);
+        }
+
+
+        .box h1 {
+            margin-bottom: 10px;
+        }
+
+
+        .box p {
+            color: #999;
+            margin-bottom: 25px;
+        }
+
+
+        input {
+            width: 100%;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            border: 1px solid #555;
+
+            background: #202020;
+
+            color: white;
+
+            font-size: 16px;
+
+            margin-bottom: 15px;
+
+            outline: none;
+        }
+
+
+        input:focus {
+            border-color: #00e676;
+
+            box-shadow:
+                0 0 10px rgba(0, 230, 118, 0.2);
+        }
+
+
+        button {
+            width: 100%;
+
+            padding: 15px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: #00e676;
+
+            color: #000;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+
+
+        /* =========================
+           HACK PAGE
+        ========================= */
+
+        #hackPage {
+            display: none;
+
+            position: relative;
+
+            width: 100%;
+
+            min-height: 100vh;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    #280000 0%,
+                    #0b0000 45%,
+                    #000 100%
+                );
+
+            text-align: center;
+        }
+
+
+        /* =========================
+           FALLING CODE BACKGROUND
+        ========================= */
+
+        .matrix-bg {
+            position: absolute;
+
+            inset: 0;
+
+            overflow: hidden;
+
+            opacity: 0.38;
+
+            pointer-events: none;
+        }
+
+
+        .matrix-bg span {
+            position: absolute;
+
+            top: -120px;
+
+            color: #00ff41;
+
+            font-family: monospace;
+
+            font-size: 14px;
+
+            line-height: 22px;
+
+            white-space: nowrap;
+
+            writing-mode: vertical-rl;
+
+            text-shadow:
+                0 0 8px #00ff41;
+
+            animation:
+                matrixFall linear infinite;
+        }
+
+
+        @keyframes matrixFall {
+
+            from {
+                transform: translateY(-120px);
+            }
+
+            to {
+                transform: translateY(115vh);
+            }
+
+        }
+
+
+
+        /* =========================
+           WARNING BANNER
+        ========================= */
+
+        .warningBanner {
+
+            position: relative;
+
+            z-index: 20;
+
+            width: 100%;
+
+            padding: 15px 10px;
+
+            background: #d50000;
+
+            color: white;
+
+            font-size: 17px;
+
+            font-weight: bold;
+
+            letter-spacing: 2px;
+
+            box-shadow:
+                0 0 25px red;
+
+            animation:
+                warningFlash 0.8s infinite;
+        }
+
+
+        @keyframes warningFlash {
+
+            0%,
+            100% {
+                background: #b00000;
+            }
+
+            50% {
+                background: #ff1744;
+            }
+
+        }
+
+
+
+        /* =========================
+           MOVING RED SCAN LINE
+        ========================= */
+
+        #hackPage::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+
+            top: 0;
+
+            width: 100%;
+
+            height: 3px;
+
+            background: red;
+
+            box-shadow:
+                0 0 15px red,
+                0 0 30px red;
+
+            animation:
+                screenScan 2s linear infinite;
+
+            z-index: 15;
+
+            pointer-events: none;
+        }
+
+
+        @keyframes screenScan {
+
+            from {
+                top: 0;
+            }
+
+            to {
+                top: 100%;
+            }
+
+        }
+
+
+
+        /* =========================
+           BACKGROUND WARNING WORDS
+        ========================= */
+
+        .hackingOverlay {
+
+            position: absolute;
+
+            inset: 0;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: space-around;
+
+            align-items: center;
+
+            pointer-events: none;
+
+            opacity: 0.12;
+
+            color: red;
+
+            font-family: monospace;
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+            transform: rotate(-8deg);
+
+            z-index: 2;
+        }
+
+
+
+        /* =========================
+           HACK CONTENT
+        ========================= */
+
+        .hackContent {
+
+            position: relative;
+
+            z-index: 10;
+
+            padding: 55px 20px 30px;
+        }
+
+
+        .dangerIcon {
+
+            font-size: 65px;
+
+            margin-bottom: 10px;
+
+            animation:
+                shake 0.4s infinite;
+        }
+
+
+        @keyframes shake {
+
+            0% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-6px);
+            }
+
+            50% {
+                transform: translateX(6px);
+            }
+
+            75% {
+                transform: translateX(-6px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+
+        }
+
+
+
+        #hackPage h1 {
+
+            color: #ff1744;
+
+            font-size: 34px;
+
+            margin: 10px 0;
+
+            text-shadow:
+                0 0 10px red,
+                0 0 25px red;
+        }
+
+
+        .warningText {
+
+            color: #ff8a80;
+
+            margin: 10px;
+
+            font-size: 15px;
+        }
+
+
+
+        /* =========================
+           FAKE SCAN BOX
+        ========================= */
+
+        .scanBox {
+
+            width: 90%;
+
+            max-width: 450px;
+
+            margin: 25px auto;
+
+            padding: 20px;
+
+            border: 1px solid #ff1744;
+
+            background:
+                rgba(255, 0, 0, 0.07);
+
+            text-align: left;
+
+            border-radius: 8px;
+
+            box-shadow:
+                0 0 20px rgba(255, 0, 0, 0.12);
+        }
+
+
+        .scanBox p {
+
+            color: #ffb0b0;
+
+            margin-bottom: 8px;
+        }
+
+
+        .scanLine {
+
+            height: 9px;
+
+            background: #350000;
+
+            margin-top: 15px;
+
+            border-radius: 10px;
+
+            overflow: hidden;
+        }
+
+
+        .scanProgress {
+
+            height: 100%;
+
+            width: 5%;
+
+            background: red;
+
+            box-shadow:
+                0 0 15px red;
+
+            animation:
+                scanning 10s linear forwards;
+        }
+
+
+        @keyframes scanning {
+
+            from {
+                width: 5%;
+            }
+
+            to {
+                width: 100%;
+            }
+
+        }
+
+
+
+        /* =========================
+           COUNTDOWN
+        ========================= */
+
+        #countdown {
+
+            font-size: 90px;
+
+            font-weight: bold;
+
+            color: red;
+
+            margin: 20px 0;
+
+            text-shadow:
+                0 0 10px red,
+                0 0 30px red;
+
+            animation:
+                countdownPulse 1s infinite;
+        }
+
+
+        @keyframes countdownPulse {
+
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.12);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+
+        }
+
+
+        #status {
+
+            color: #ff5252;
+
+            font-size: 17px;
+
+            min-height: 22px;
+        }
+
+
+
+        /* =========================
+           WARNING CARDS
+        ========================= */
+
+        .warningCards {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+
+            margin-top: 25px;
+        }
+
+
+        .card {
+
+            border: 1px solid #8b0000;
+
+            background: #160000;
+
+            padding: 10px 14px;
+
+            color: #ff5252;
+
+            border-radius: 6px;
+
+            font-size: 12px;
+
+            box-shadow:
+                0 0 10px rgba(255, 0, 0, 0.1);
+        }
+
+
+
+        /* =========================
+           PRANK REVEAL
+        ========================= */
+
+        #prankPage {
+
+            display: none;
+
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle,
+                    #123d25,
+                    #050505 70%
+                );
+
+            text-align: center;
+
+            padding: 25vh 20px;
+        }
+
+
+        #prankPage h1 {
+
+            color: #00e676;
+
+            font-size: 48px;
+
+            text-shadow:
+                0 0 15px #00e676;
+        }
+
+
+        #prankPage p {
+
+            margin-top: 18px;
+
+            font-size: 20px;
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         LOGIN PAGE
+    ========================= -->
+
+    <div id="loginPage">
+
+        <div class="box">
+
+            <h1>Student Login</h1>
+
+            <p>
+                Enter your name to continue
+            </p>
+
+            <input
+                type="text"
+                id="name"
+                placeholder="Enter your name"
+                autocomplete="off"
+            >
+
+            <button onclick="login()">
+                Continue
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         HACK PAGE
+    ========================= -->
+
+    <div id="hackPage">
+
+
+        <!-- Falling code -->
+
+        <div
+            class="matrix-bg"
+            id="matrixBg">
+        </div>
+
+
+        <!-- Warning banner -->
+
+        <div class="warningBanner">
+
+            ⚠ SYSTEM WARNING ⚠
+            &nbsp;
+            DEVICE SECURITY COMPROMISED
+            &nbsp;
+            ⚠
+
+        </div>
+
+
+        <!-- Background words -->
+
+        <div class="hackingOverlay">
+
+            <div>
+                ACCESS DENIED
+            </div>
+
+            <div>
+                SYSTEM BREACH DETECTED
+            </div>
+
+            <div>
+                SECURITY FAILURE
+            </div>
+
+            <div>
+                UNAUTHORIZED ACCESS
+            </div>
+
+            <div>
+                DEVICE SCANNING...
+            </div>
+
+        </div>
+
+
+
+        <!-- Main content -->
+
+        <div class="hackContent">
+
+
+            <div class="dangerIcon">
+                ⚠️
+            </div>
+
+
+            <h1>
+                YOUR MOBILE IS HACKED
+            </h1>
+
+
+            <p class="warningText">
+                Unauthorized activity detected
+            </p>
+
+
+
+            <!-- Fake scan -->
+
+            <div class="scanBox">
+
+                <p>
+                    🔴 Security scan running...
+                </p>
+
+                <p>
+                    Checking device security...
+                </p>
+
+                <div class="scanLine">
+
+                    <div
+                        class="scanProgress">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Countdown -->
+
+            <div id="countdown">
+                10
+            </div>
+
+
+            <p id="status">
+                Checking device...
+            </p>
+
+
+
+            <!-- Warning cards -->
+
+            <div class="warningCards">
+
+                <div class="card">
+                    ⚠ SYSTEM ALERT
+                </div>
+
+                <div class="card">
+                    ⚠ SECURITY ERROR
+                </div>
+
+                <div class="card">
+                    ⚠ DEVICE SCAN
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         PRANK PAGE
+    ========================= -->
+
+    <div id="prankPage">
+
+        <h1>
+            😂 IT'S A PRANK!
+        </h1>
+
+        <p id="friendMessage"></p>
+
+        <p>
+            Your mobile is completely safe 😎
+        </p>
+
+    </div>
+
+
+
+    <script>
+
+
+        /* =========================
+           30 FRIENDS
+        ========================= */
+
+        const friends = [
+
+            {
+                name: "sunil",
+                alert: "Ho Sunil 😂 Yen guru!"
+            },
+
+            {
+                name: "rahul",
+                alert: "Aye Rahul 😂 Ninage special message ide!"
+            },
+
+            {
+                name: "kiran",
+                alert: "Kiran 😂 Swalpa careful guru!"
+            },
+
+            {
+                name: "rohan",
+                alert: "Rohan 😂 Neevu selected!"
+            },
+
+            {
+                name: "akshay",
+                alert: "Akshay 😂 Something suspicious happened!"
+            },
+
+            {
+                name: "manoj",
+                alert: "Manoj 😂 System nin hesaru detect madide!"
+            },
+
+            {
+                name: "vijay",
+                alert: "Vijay 😂 Yen guru idu!"
+            },
+
+            {
+                name: "arun",
+                alert: "Arun 😂 Ninage special alert!"
+            },
+
+            {
+                name: "sachin",
+                alert: "Sachin 😂 System nin hesaru gothu!"
+            },
+
+            {
+                name: "prashanth",
+                alert: "Prashanth 😂 Don't panic!"
+            },
+
+            {
+                name: "harish",
+                alert: "Harish 😂 Something is happening!"
+            },
+
+            {
+                name: "rohit",
+                alert: "Rohit 😂 Wait and see!"
+            },
+
+            {
+                name: "suresh",
+                alert: "Suresh 😂 Ninage surprise ide!"
+            },
+
+            {
+                name: "naveen",
+                alert: "Naveen 😂 Security alert!"
+            },
+
+            {
+                name: "karthik",
+                alert: "Karthik 😂 System check started!"
+            },
+
+            {
+                name: "darshan",
+                alert: "Darshan 😂 Don't close this page!"
+            },
+
+            {
+                name: "pavan",
+                alert: "Pavan 😂 Something strange detected!"
+            },
+
+            {
+                name: "ganesh",
+                alert: "Ganesh 😂 Ninage special prank!"
+            },
+
+            {
+                name: "abhishek",
+                alert: "Abhishek 😂 System busy!"
+            },
+
+            {
+                name: "manjunath",
+                alert: "Manjunath 😂 Wait 10 seconds!"
+            },
+
+            {
+                name: "deepak",
+                alert: "Deepak 😂 Security scan started!"
+            },
+
+            {
+                name: "vinay",
+                alert: "Vinay 😂 Nin hesaru detect aagide!"
+            },
+
+            {
+                name: "ajay",
+                alert: "Ajay 😂 Something is coming!"
+            },
+
+            {
+                name: "sanjay",
+                alert: "Sanjay 😂 Stay calm!"
+            },
+
+            {
+                name: "yash",
+                alert: "Yash 😂 You are today's target!"
+            },
+
+            {
+                name: "lokesh",
+                alert: "Lokesh 😂 Special warning!"
+            },
+
+            {
+                name: "shashank",
+                alert: "Shashank 😂 Don't panic!"
+            },
+
+            {
+                name: "suraj",
+                alert: "Suraj 😂 Your turn!"
+            },
+
+            {
+                name: "abhay",
+                alert: "Abhay 😂 Surprise incoming!"
+            },
+
+            {
+                name: "mahesh",
+                alert: "Mahesh 😂 System detected you!"
+            }
+
+        ];
+
+
+
+        /* =========================
+           CREATE FALLING CODE
+        ========================= */
+
+        function createMatrix() {
+
+            const matrix =
+                document.querySelector("#matrixBg");
+
+
+            const characters =
+                "010101010101 HACK SYSTEM ERROR ACCESS DENIED";
+
+
+            for (let i = 0; i < 45; i++) {
+
+                const span =
+                    document.createElement("span");
+
+
+                span.textContent =
+                    characters;
+
+
+                span.style.left =
+                    Math.random() * 100 + "%";
+
+
+                span.style.animationDuration =
+                    (2 + Math.random() * 5) + "s";
+
+
+                span.style.animationDelay =
+                    Math.random() * 4 + "s";
+
+
+                span.style.opacity =
+                    0.3 + Math.random() * 0.7;
+
+
+                matrix.appendChild(span);
+
+            }
+
+        }
+
+
+
+        /* =========================
+           LOGIN
+        ========================= */
+
+        function login() {
+
+            const input =
+                document.querySelector("#name");
+
+
+            const enteredName =
+                input.value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (enteredName === "") {
+
+                alert(
+                    "Please enter your name!"
+                );
+
+                return;
+            }
+
+
+
+            /*
+                Case insensitive:
+
+                Sunil
+                sunil
+                SUNIL
+
+                All match.
+            */
+
+            const friend =
+                friends.find(
+                    person =>
+                        person.name
+                            .toLowerCase()
+                        === enteredName
+                );
+
+
+
+            if (!friend) {
+
+                alert(
+                    "Name not found 😂 Enter your correct name!"
+                );
+
+                return;
+            }
+
+
+
+            /* Friend-specific alert */
+
+            alert(friend.alert);
+
+
+
+            /* Hide login */
+
+            document.querySelector("#loginPage")
+                .style.display = "none";
+
+
+
+            /* Show fake hack screen */
+
+            document.querySelector("#hackPage")
+                .style.display = "block";
+
+
+
+            /* Create background */
+
+            createMatrix();
+
+
+
+            /* Start countdown */
+
+            startCountdown(friend);
+
+        }
+
+
+
+        /* =========================
+           COUNTDOWN
+        ========================= */
+
+        function startCountdown(friend) {
+
+            let time = 10;
+
+
+            const countdown =
+                document.querySelector("#countdown");
+
+
+            const status =
+                document.querySelector("#status");
+
+
+            countdown.textContent =
+                time;
+
+
+
+            const timer =
+                setInterval(function () {
+
+                    time--;
+
+
+                    countdown.textContent =
+                        time;
+
+
+
+                    if (
+                        time <= 7 &&
+                        time > 4
+                    ) {
+
+                        status.textContent =
+                            "⚠ Scanning device files...";
+
+                    }
+
+
+
+                    if (
+                        time <= 4 &&
+                        time > 2
+                    ) {
+
+                        status.textContent =
+                            "⚠ Checking security status...";
+
+                    }
+
+
+
+                    if (
+                        time <= 2 &&
+                        time > 0
+                    ) {
+
+                        status.textContent =
+                            "⚠ Final security check...";
+
+                    }
+
+
+
+                    if (time <= 0) {
+
+                        clearInterval(timer);
+
+                        showPrank(friend);
+
+                    }
+
+                }, 1000);
+
+        }
+
+
+
+        /* =========================
+           PRANK REVEAL
+        ========================= */
+
+        function showPrank(friend) {
+
+            document.querySelector("#hackPage")
+                .style.display = "none";
+
+
+            document.querySelector("#prankPage")
+                .style.display = "block";
+
+
+            document.querySelector("#friendMessage")
+                .textContent =
+                "Hey " +
+                friend.name +
+                ", your mobile is completely safe 😎";
+
+        }
+
+    </script>
+
+</body>
+</html>
